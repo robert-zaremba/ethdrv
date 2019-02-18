@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	. "github.com/scale-it/checkers"
+	. "github.com/robert-zaremba/checkers"
 	. "gopkg.in/check.v1"
 )
 
