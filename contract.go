@@ -70,7 +70,7 @@ func (cf contractFactory) mkContract(ctrName string, constructor func(common.Add
 		return addr, errE
 	}
 	if err := constructor(addr); err != nil {
-		return addr, errstack.WrapAsInfF(err, "Can't construct %s contract instance", ctrName)
+		return addr, errstack.WrapAsIOf(err, "Can't create new %q contract instance", ctrName)
 	}
 	return addr, nil
 }

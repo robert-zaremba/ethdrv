@@ -45,6 +45,6 @@ func SubscribeSimple(ctx context.Context,
 func UnmarshalEvent(dest interface{}, data []byte, e abi.Event) errstack.E {
 	a := abi.ABI{Events: map[string]abi.Event{"e": e}}
 	err := a.Unpack(dest, "e", data)
-	return errstack.WrapAsInf(err,
-		"Probably the ABI doesn't match with the contract version")
+	return errstack.WrapAsDomain(err,
+		"Probably the ABI doesn't match the contract version")
 }
