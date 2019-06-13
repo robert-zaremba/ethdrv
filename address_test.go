@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ethereum
+package ethdrv
 
 import (
 	"strings"
@@ -35,14 +35,18 @@ type AddressSuite struct{}
 
 func (e AddressSuite) TestIsZeroAddr(c *C) {
 	c.Assert(IsZeroAddr(ZeroAddress), IsTrue)
+}
 
-	// check invalid or zero addresses
+func (e AddressSuite) TestHexToAddress(c *C) {
+	// this invalid addresses are parsed correctly (except correct 0x address)
+	// what's happening is that the common.HexToAddress reads the characters until it
+	// will reach the a character it can't parse. It won't report an error, so it will return
+	// a valid hex form the characters he succeed to read and put it as an address.
 	var as = []string{"", "0", "0x0",
 		"0x0000000000000000000000000000000000000000",
 		"0000000000000000000000000000000000000000",
 		"x", "yyy", "0xy", "0y",
-		// spaces are not removed
-		"12 34", " 1234", "1234 ",
+		" 1234",
 		// even so long addresses are trimmed, it checks the character range
 		"yyce0d46d924cc8437c806721496599fc3ffa268b9123"}
 	checkIsZeroAddr(as, true, c)
@@ -55,6 +59,8 @@ func (e AddressSuite) TestIsZeroAddr(c *C) {
 		"ce0d46d924cc8437c806721496599fc3ffa268b9",
 		// single digits are valid addresses
 		"1", "2", "9",
+		// xxx
+		"12 34", "1234 ",
 		// long addresses are left-trimmed
 		"0xce0d46d924cc8437c806721496599fc3ffa268b9123",
 		"ce0d46d924cc8437c806721496599fc3ffa268b9123",
@@ -133,16 +139,4 @@ func (e AddressSuite) TestPgtAddress(c *C) {
 	var paddr3 = new(PgtAddress)
 	c.Assert(paddr3.Scan(b), IsNil, Commentf("Can't deserialize PgtAddress to pointer"))
 	c.Check(paddr3.Hex(), Equals, hex)
-}
-
-func (e AddressSuite) TestHashToAddress(c *C) {
-	s := "0x000000000000000000000000d435bbbaa004889f95f54e8232575d87793b42df"
-	addr, err := HashToAddress(common.HexToHash(s))
-	c.Assert(err, IsNil)
-	c.Assert(strings.ToLower(addr.Hex()), Equals, "0x"+s[26:])
-
-	// check wrong address
-	s = "0x0000000000000000000000000001bbbaa004889f95f54e8232575d87793b42zz"
-	addr, err = HashToAddress(common.HexToHash(s))
-	c.Assert(err, Not(IsNil))
 }

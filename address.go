@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ethereum
+package ethdrv
 
 import (
 	"database/sql/driver"
@@ -48,15 +48,6 @@ func ParseAddressErrp(addr string, errp errstack.Putter) common.Address {
 		errp.Put(err)
 	}
 	return a
-}
-
-// HashToAddress encodes address from hash data
-func HashToAddress(h common.Hash) (common.Address, errstack.E) {
-	addr := common.BytesToAddress(h.Bytes())
-	if IsZeroAddr(addr) {
-		return addr, errstack.NewReq("must have 0x prefix")
-	}
-	return addr, nil
 }
 
 // IsZeroAddr check if `a` is zero or invalid address
