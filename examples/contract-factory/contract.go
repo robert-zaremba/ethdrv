@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ethereum
+package cf
 
 import (
-	"bitbucket.org/sweetbridge/oracles/go-contracts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -30,16 +29,9 @@ const (
 	CtrSWClogic = "SweetTokenLogic"
 )
 
-// Contracts is a list of available contracts
-var availableContracts = []string{
-	CtrSWC, CtrSWClogic,
-}
-
 // ContractFactory delivers methods to easily construct contracts
 type ContractFactory interface {
-	GetSWC() (*contracts.SweetToken, common.Address, errstack.E)
-	GetSWClogic() (*contracts.SweetTokenLogic, common.Address, errstack.E)
-	GetForwarderFactory() (*contracts.ForwarderFactory, common.Address, errstack.E)
+	GetSWC() (*SweetToken, common.Address, errstack.E)
 
 	ethdrv.TxrFactory
 }
@@ -94,10 +86,10 @@ func (cf contractFactory) getSchemaAddres(contractName string) (common.Address, 
 	return addr, nil
 }
 
-func (cf contractFactory) GetSWC() (c *contracts.SweetToken, addr common.Address, err errstack.E) {
+func (cf contractFactory) GetSWC() (c *SweetToken, addr common.Address, err errstack.E) {
 	addr, err = cf.mkContract(CtrSWC, func(addr common.Address) (err2 error) {
-		c, err2 = contracts.NewSweetToken(addr, cf.client)
-		return
+		c, err2 = NewSweetToken(addr, cf.client)
+		return err2
 	})
 	return
 }
@@ -108,7 +100,7 @@ func (cf contractFactory) mkContract(ctrName string, constructor func(common.Add
 		return addr, errE
 	}
 	if err := constructor(addr); err != nil {
-		return addr, errstack.WrapAsInfF(err, "Can't construct %s contract instance", ctrName)
+		return addr, errstack.WrapAsIOf(err, "Can't construct %s contract instance", ctrName)
 	}
 	return addr, nil
 }
